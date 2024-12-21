@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WTX Global Transformation Center</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #3b82f6;
+            --accent-color: #60a5fa;
+            --text-light: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .school-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(37, 99, 235, 0.5);
+            z-index: 2;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+        }
+        
+        .school-center:hover {
+            background: var(--accent-color);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .school-center h2 {
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+
+        .school-center p {
+            font-size: 12px;
+            line-height: 1.2;
+        }
+
+        .connection-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .wtx-button {
+            position: absolute;
+            width: 160px;
+            padding: 15px;
+            background: var(--secondary-color);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+        }
+
+        .wtx-button:hover {
+            background: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .language-btn {
+            padding: 8px 16px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            background: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .language-btn:hover {
+            background: var(--accent-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(15, 23, 42, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .connector-line {
+            stroke: var(--accent-color);
+            stroke-width: 2;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="language-selector">
+        <button class="language-btn" onclick="changeLanguage('en')">EN</button>
+        <button class="language-btn" onclick="changeLanguage('fr')">FR</button>
+        <button class="language-btn" onclick="changeLanguage('es')">ES</button>
+        <button class="language-btn" onclick="changeLanguage('pt')">PT</button>
+        <button class="language-btn" onclick="changeLanguage('de')">DE</button>
+    </div>
+
+    <div class="container">
+        <svg class="connection-lines" id="connectionLines"></svg>
+        <div class="school-center">
+            <h2>WTX</h2>
+            <p>Programa para desarrollar a las escuelas como centros de transformación mundial</p>
+        </div>
+        <div id="buttons"></div>
+    </div>
+
+    <div class="modal" id="infoModal">
+        <button class="close-modal" onclick="closeModal()">×</button>
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <script>
+        const translations = {
+            'wtx-center': {
+                en: "Program to develop schools as world transformation centers",
+                fr: "Programme pour développer les écoles en tant que centres de transformation mondiale",
+                es: "Programa para desarrollar a las escuelas como centros de transformación mundial",
+                pt: "Programa para desenvolver escolas como centros de transformação mundial",
+                de: "Programm zur Entwicklung von Schulen als globale Transformationszentren"
+            },
+            'wtx-vision': {
+                en: "WTX Vision: Seeking future integration of students in society and economy with opportunities created by each student's life purpose",
+                fr: "Vision WTX : Rechercher l'intégration future des étudiants dans la société et l'économie avec des opportunités créées par le projet de vie de chaque étudiant",
+                es: "WTX Visión: Buscar la integración futura de los estudiantes en la sociedad y la economía con oportunidades creadas por el propósito de vida de cada estudiante",
+                pt: "Visão WTX: Buscar a integração futura dos estudantes na sociedade e na economia com oportunidades criadas pelo propósito de vida de cada estudante",
+                de: "WTX Vision: Strebt die zukünftige Integration von Studenten in Gesellschaft und Wirtschaft an, mit Möglichkeiten, die durch den Lebenszweck jedes Studenten geschaffen werden"
+            },
+            'wtx-innovation': {
+                en: "WTX Innovation: Develop a global network of innovators among schools with integration projects from each school",
+                fr: "Innovation WTX : Développer un réseau mondial d'innovateurs entre les écoles avec des projets d'intégration de chaque école",
+                es: "WTX Innovación: Desarrollar entre las escuelas una red mundial de innovadores con los proyectos de integración de cada escuela",
+                pt: "Inovação WTX: Desenvolver entre as escolas uma rede mundial de inovadores com os projetos de integração de cada escola",
+                de: "WTX Innovation: Entwicklung eines globalen Netzwerks von Innovatoren zwischen Schulen mit Integrationsprojekten jeder Schule"
+            },
+            'wtx-focus': {
+                en: "WTX Focus: Focus students on becoming solution creators with support from WTX program experiences",
+                fr: "Focus WTX : Concentrer les étudiants sur la création de solutions avec le soutien des expériences du programme WTX",
+                es: "WTX Focus: Enfocar a los estudiantes en ser creadores de soluciones con el apoyo de las experiencias de WTX program",
+                pt: "Foco WTX: Focar os estudantes em serem criadores de soluções com o apoio das experiências do programa WTX",
+                de: "WTX Focus: Fokussierung der Studenten darauf, Lösungsschöpfer zu werden, unterstützt durch WTX-Programmerfahrungen"
+            },
+            'wtx-proyecto': {
+                en: "WTX Project: Creation of autonomous real projects with selected opportunities that impact consumers of the differential and digital solution",
+                fr: "Projet WTX : Création de projets réels autonomes avec des opportunités sélectionnées qui impactent les consommateurs de la solution différentielle et numérique",
+                es: "WTX Proyecto: Creación de proyectos reales autónomos con las oportunidades seleccionadas que impacten consumidores de la solución diferencial y digital",
+                pt: "Projeto WTX: Criação de projetos reais autônomos com oportunidades selecionadas que impactam consumidores da solução diferencial e digital",
+                de: "WTX Projekt: Entwicklung autonomer realer Projekte mit ausgewählten Möglichkeiten, die Verbraucher der differenziellen und digitalen Lösung beeinflussen"
+            },
+            'wtx-path': {
+                en: "WTX Path: Develop intuitive and logical stages of each project from purpose to significant impact on society and economy",
+                fr: "Chemin WTX : Développer les étapes intuitives et logiques de chaque projet du but à l'impact significatif sur la société et l'économie",
+                es: "WTX Path: Desarrolla las etapas intuitivas y lógicas de cada proyecto desde el propósito hasta el impacto significativo en la sociedad y la economía",
+                pt: "Caminho WTX: Desenvolver as etapas intuitivas e lógicas de cada projeto desde o propósito até o impacto significativo na sociedade e economia",
+                de: "WTX Pfad: Entwicklung intuitiver und logischer Projektphasen vom Zweck bis zur bedeutenden Auswirkung auf Gesellschaft und Wirtschaft"
+            },
+            'wtx-aligning': {
+                en: "WTX Aligning: Define students who will take WTX program and train teachers and parents to impact student evolution and environment",
+                fr: "Alignement WTX : Définir les étudiants qui suivront le programme WTX et former les enseignants et les parents pour qu'ils impactent l'évolution et l'environnement des étudiants",
+                es: "WTX Aligning: Definir los estudiantes que tomarán WTX program y entrenar los profesores y padres de los estudiantes para que impacten la evolución y el entorno de los estudiantes",
+                pt: "Alinhamento WTX: Definir os estudantes que participarão do programa WTX e treinar professores e pais para impactar a evolução e o ambiente dos estudantes",
+                de: "WTX Ausrichtung: Definition der Studenten für das WTX-Programm und Schulung von Lehrern und Eltern zur Beeinflussung der Entwicklung und Umgebung der Studenten"
+            },
+            'wtx-prompts': {
+                en: "WTX Prompts: Develop symbiotic interaction with AI that reflects humanity over time and currently hosts the totality of human knowledge",
+                fr: "Prompts WTX : Développer une interaction symbiotique avec l'IA qui reflète l'humanité dans le temps et héberge actuellement la totalité des connaissances humaines",
+                es: "WTX Prompts: Desarrollar una interacción simbiótica con la IA que es el reflejo de la humanidad en el tiempo y aloja en este momento la totalidad del conocimiento humano",
+                pt: "Prompts WTX: Desenvolver uma interação simbiótica com a IA que reflete a humanidade ao longo do tempo e atualmente hospeda a totalidade do conhecimento humano",
+                de: "WTX Prompts: Entwicklung symbiotischer Interaktion mit KI, die die Menschheit über die Zeit widerspiegelt und derzeit die Gesamtheit des menschlichen Wissens beherbergt"
+            }
+        };
+
+        let currentLanguage = 'en';
+
+        function createButtons() {
+            const buttonsContainer = document.getElementById('buttons');
+            const buttons = Object.keys(translations);
+            const angleStep = (2 * Math.PI) / buttons.length;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const radius = Math.min(window.innerWidth, window.innerHeight) * 0.45;
+
+            buttons.forEach((id, index) => {
+                const button = document.createElement('div');
+                button.className = 'wtx-button';
+                button.id = id;
+                button.textContent = id.split('-')[1].toUpperCase();
+                
+                const angle = index * angleStep - Math.PI / 2;
+                const x = centerX + Math.cos(angle) * radius - 80;
+                const y = centerY + Math.sin(angle) * radius - 25;
+                
+                button.style.left = `${x}px`;
+                button.style.top = `${y}px`;
+                button.onclick = () => showModal(id);
+                
+                buttonsContainer.appendChild(button);
+            });
+
+            drawConnectingLines();
+        }
+
+        function drawConnectingLines() {
+            const svg = document.getElementById('connectionLines');
+            svg.setAttribute('width', window.innerWidth);
+            svg.setAttribute('height', window.innerHeight);
+            
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            const buttons = document.querySelectorAll('.wtx-button');
+            buttons.forEach(button => {
+                const rect = button.getBoundingClientRect();
+                const buttonCenterX = rect.left + rect.width / 2;
+                const buttonCenterY = rect.top + rect.height / 2;
+                
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', centerX);
+                line.setAttribute('y1', centerY);
+                line.setAttribute('x2', buttonCenterX);
+                line.setAttribute('y2', buttonCenterY);
+                line.setAttribute('class', 'connector-line');
+                
+                svg.appendChild(line);
+            });
+        }
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            // Update center text
+            const centerText = document.querySelector('.school-center p');
+            centerText.textContent = translations['wtx-center'][lang];
+            
+            // Update modal content if open
+            Object.keys(translations).forEach(id => {
+                const modal = document.getElementById('modalContent');
+                if (modal.getAttribute('data-current-id') === id) {
+                    modal.textContent = translations[id][currentLanguage];
+                }
+            });
+        }
+
+        function showModal(id) {
+            const modal = document.getElementById('infoModal');
+            const content = document.getElementById('modalContent');
+            content.setAttribute('data-current-id', id);
+            content.textContent = translations[id][currentLanguage];
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        window.addEventListener('resize', () => {
+            const svg = document.getElementById('connectionLines');
+            svg.innerHTML = '';
+            drawConnectingLines();
+        });
+
+        createButtons();
+    </script>
+</body>
+</html>
